@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ShopTARpe25.Core.Domain
 {
-    public class SpaceShip
+    public class Spaceship
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;

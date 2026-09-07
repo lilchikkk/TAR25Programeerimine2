@@ -7,7 +7,7 @@ namespace ShopTARpe25.Core.Dto
     //Dto slass vahendab andmeid controlleri  ja servise klassi vahel  vahel.
     public class SpaceshipDto
     {
-        public class SpaceShip
+        public class Spaceship
         {
             public Guid Id { get; set; }
             public string Name { get; set; } = string.Empty;

@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopTARpe25.Core.Domain;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 
 namespace ShopTARpe25.Data

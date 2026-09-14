@@ -1,5 +1,6 @@
 ﻿using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
+using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
 
 
@@ -24,7 +25,7 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.Id = dto.Id;
             domain.Name = dto.Name;
             domain.Classification = dto.Classification;
-            domain.Builddate = dto.BuildDate;
+            domain.Builddate = dto.Builddate;
             domain.Crew = dto.Crew;
             domain.EnginePower = dto.EnginePower;
             domain.CreatedAt = dto.CreatedAt;

@@ -1,4 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using ShopTARpe25.Core.ServiceInterface;
+using ShopTARpe25.ApplicationServices.Services;
+using ShopTARpe25.Data;
 
 namespace ShopTAR25
 {
@@ -15,7 +18,7 @@ namespace ShopTAR25
             // ja microsoft entity freme work tools nu get paketid
             // kui installitud siis viidata namespacesis microsoft entity framework core 
             builder.Services.AddScoped<ISpaceshipServices, SpaceshipServices>();
-            builder.Services.AddDbContext<ShopTAR25context>(options =>
+            builder.Services.AddDbContext<ShopTARpe25Context>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();

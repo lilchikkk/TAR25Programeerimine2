@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShopTAR25.Models.Spaceship;
+using ShopTARpe25.ApplicationServices.Services;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
@@ -54,6 +55,21 @@ namespace ShopTAR25.Controllers
             var result = await _spaceshipServices.Create(dto);
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // tuleb teha Details meetod
+        // see kutsub välja interfacest service meetodi
+
+        [HttpGet]
+        public async Task<IActionResult> Details(Guid id)
+        {
+            var spaceship = await _spaceshipServices.DetailsAsync(id);
+
+            if (spaceship == null)
+            {
+                return NotFound();
+            }
+            return View();
         }
     }
 }

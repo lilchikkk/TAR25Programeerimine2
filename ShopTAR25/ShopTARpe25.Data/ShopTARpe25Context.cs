@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopTARpe25.Core.Domain;
+using ShopTARpe25.Core.Dto;
 
 
 namespace ShopTARpe25.Data
@@ -14,5 +15,6 @@ namespace ShopTARpe25.Data
         //teha DbSet, et saaks andmebaasi kasutada
         //nimega SpaceShip
         public DbSet<Spaceship> Spaceships { get; set; }
+        public DbSet<FileToApi> FileToApis { get; set; }
     }
 }

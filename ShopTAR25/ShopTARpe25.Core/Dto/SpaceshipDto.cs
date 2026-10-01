@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
+
 namespace ShopTARpe25.Core.Dto
 {
     //Dto slass vahendab andmeid controlleri  ja servise klassi vahel  vahel.
@@ -16,6 +17,7 @@ namespace ShopTARpe25.Core.Dto
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
-
+        public List<IFormFile>? Files { get; set; }
+        public IEnumerable<FileToApiDto>? FileToApiDtos { get; set; }
     }
 }

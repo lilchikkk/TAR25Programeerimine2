@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ShopTAR25.Models.Spaceship;
-using ShopTARpe25.ApplicationServices.Services;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
@@ -11,12 +11,18 @@ namespace ShopTAR25.Controllers
     {
         private readonly ISpaceshipServices _spaceshipServices;
         private readonly ShopTARpe25Context _context;
+        private readonly IWebHostEnvironment _webHost;
 
-        public SpaceshipController(ISpaceshipServices spaceshipServices, ShopTARpe25Context context)
+        public SpaceshipController(
+            ISpaceshipServices spaceshipServices,
+            ShopTARpe25Context context,
+            IWebHostEnvironment webHost)
         {
             _spaceshipServices = spaceshipServices;
             _context = context;
+            _webHost = webHost;
         }
+
         public IActionResult Index()
         {
             var result = _context.Spaceships
@@ -49,16 +55,21 @@ namespace ShopTAR25.Controllers
                 Classification = vm.Classification,
                 Builddate = vm.Builddate,
                 Crew = vm.Crew,
-                EnginePower = vm.EnginePower
+                EnginePower = vm.EnginePower,
+                Files = vm.Files,
+                FileToApiDtos = vm.Image
+                    .Select(x => new FileToApiDto
+                    {
+                        Id = x.ImageId,
+                        ExistingFilePath = x.FilePath,
+                        SpaceshipId = x.SpaceshipId
+                    }).ToArray()
             };
 
             var result = await _spaceshipServices.Create(dto);
 
             return RedirectToAction(nameof(Index));
         }
-
-        // tuleb teha Details meetod
-        // see kutsub välja interfacest service meetodi
 
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
@@ -71,6 +82,7 @@ namespace ShopTAR25.Controllers
             }
             return View();
         }
+
         [HttpGet]
         public async Task<IActionResult> Update(Guid id)
         {
@@ -81,17 +93,29 @@ namespace ShopTAR25.Controllers
                 return NotFound();
             }
 
+            var vm = new SpaceshipUpdateViewModel
+            {
+                Id = spaceship.Id,
+                Name = spaceship.Name,
+                Classification = spaceship.Classification,
+                Builddate = spaceship.Builddate,
+                Crew = spaceship.Crew,
+                EnginePower = spaceship.EnginePower,
+                CreatedAt = spaceship.CreatedAt,
+                ModifiedAt = spaceship.ModifiedAt
+            };
 
-            var vm = new SpaceshipUpdateViewModel();
+            var images = await _context.FileToApis
+                .Where(x => x.SpaceshipId == id)
+                .Select(y => new ImageViewModel
+                {
+                    ImageId = y.Id,
+                    FilePath = y.ExistingFilePath,
+                    SpaceshipId = y.SpaceshipId
+                })
+                .ToArrayAsync();
 
-            vm.Id = spaceship.Id;
-            vm.Name = spaceship.Name;
-            vm.Classification = spaceship.Classification;
-            vm.Builddate = spaceship.Builddate;
-            vm.Crew = spaceship.Crew;
-            vm.EnginePower = spaceship.EnginePower;
-            vm.CreatedAt = spaceship.CreatedAt;
-            vm.ModifiedAt = spaceship.ModifiedAt;
+            vm.Image.AddRange(images);
 
             return View(vm);
         }
@@ -108,18 +132,44 @@ namespace ShopTAR25.Controllers
                 Crew = vm.Crew,
                 EnginePower = vm.EnginePower,
                 CreatedAt = vm.CreatedAt,
-                ModifiedAt = vm.CreatedAt
+                ModifiedAt = vm.ModifiedAt, 
+                Files = vm.Files            
             };
 
             var result = await _spaceshipServices.Update(dto);
 
-            if (result == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
             return RedirectToAction(nameof(Index));
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveImage(Guid imageId, Guid spaceshipId)
+        {
+            var image = await _context.FileToApis
+                .FirstOrDefaultAsync(x => x.Id == imageId);
+
+            if (image == null)
+            {
+                return NotFound();
+            }
+
+            if (!string.IsNullOrEmpty(image.ExistingFilePath))
+            {
+                var filePath = Path.Combine(
+                    _webHost.ContentRootPath, "wwwroot", "multipleFileUpload", image.ExistingFilePath);
+
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            _context.FileToApis.Remove(image);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Update), new { id = spaceshipId });
+        }
+
         [HttpGet]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -130,32 +180,27 @@ namespace ShopTAR25.Controllers
                 return NotFound();
             }
 
-
-            var vm = new SpaceshipDeleteViewModel();
-
-            vm.Id = spaceship.Id;
-            vm.Name = spaceship.Name;
-            vm.Classification = spaceship.Classification;
-            vm.Builddate = spaceship.Builddate;
-            vm.Crew = spaceship.Crew;
-            vm.EnginePower = spaceship.EnginePower;
-            vm.CreatedAt = spaceship.CreatedAt;
-            vm.ModifiedAt = spaceship.ModifiedAt;
+            var vm = new SpaceshipDeleteViewModel
+            {
+                Id = spaceship.Id,
+                Name = spaceship.Name,
+                Classification = spaceship.Classification,
+                Builddate = spaceship.Builddate,
+                Crew = spaceship.Crew,
+                EnginePower = spaceship.EnginePower,
+                CreatedAt = spaceship.CreatedAt,
+                ModifiedAt = spaceship.ModifiedAt
+            };
 
             return View(vm);
         }
+
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmation(Guid id)
         {
-             var spaceship = await _spaceshipServices.Delete(id);
+            var spaceship = await _spaceshipServices.Delete(id);
 
-             if (spaceship == null)
-             {
-                return RedirectToAction(nameof(Index));
-             }
-
-             return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));
         }
-
     }
 }

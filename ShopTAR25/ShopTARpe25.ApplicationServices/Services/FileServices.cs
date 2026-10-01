@@ -23,7 +23,7 @@ namespace ShopTARpe25.ApplicationServices.Services
         }
 
 
-        public void FilesToApi(SpaceshipDto dto, Spaceship domain)
+        public async Task FilesToApi(SpaceshipDto dto, Spaceship domain)
         {
             //kindlasti peab ankeedil olema üks fail
             if (dto.Files != null && dto.Files.Count > 0)
@@ -53,10 +53,11 @@ namespace ShopTARpe25.ApplicationServices.Services
                                 //tuleb ära mappida
                                 //domain ja ??
                                 Id = Guid.NewGuid(),
-                                ExistingfilePath = uniqueFileName,
+                                ExistingFilePath = uniqueFileName,
                                 SpaceshipId = domain.Id
                             };
-                            _context.FileToApis.AddAsync(path);
+
+                            await _context.FileToApis.AddAsync(path);
                         }
                     }
                 }

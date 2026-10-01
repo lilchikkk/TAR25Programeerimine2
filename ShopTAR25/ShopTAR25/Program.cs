@@ -18,6 +18,7 @@ namespace ShopTAR25
             // ja microsoft entity freme work tools nu get paketid
             // kui installitud siis viidata namespacesis microsoft entity framework core 
             builder.Services.AddScoped<ISpaceshipServices, SpaceshipServices>();
+            builder.Services.AddScoped<IFileServices, FileServices>();
             builder.Services.AddDbContext<ShopTARpe25Context>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -32,6 +33,7 @@ namespace ShopTAR25
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthorization();

@@ -10,6 +10,7 @@ namespace ShopTARpe25.ApplicationServices.Services
     public class SpaceshipServices : ISpaceshipServices
     {
         private readonly ShopTARpe25Context _context;
+        private readonly IFileServices _fileServices;
 
         public SpaceshipServices
             (
@@ -33,6 +34,9 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.ModifiedAt = dto.ModifiedAt;
             domain.CreatedAt = DateTime.Now;
             domain.ModifiedAt = DateTime.Now;
+            //reame saama file teenuses välja kutsuda meetod,
+            //mis salvestab failid servisesse
+            _fileServices.FilesToApi(dto, domain);
 
             //siia tuleb kood, mis salvetab domain
             //objekti andmebaasi'

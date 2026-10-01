@@ -1,0 +1,17 @@
+﻿@model ShopTAR25.Models.Spaceship.ImageViewModel
+
+<div class="form-group row mb-3">
+    <div class="col-sm-4 offset-sm-2">
+        <img src="~/multipleFileUpload/@Model.FilePath"
+             alt="Spaceship image"
+             style="max-width:150px;" />
+
+        <button type="submit"
+                class="btn btn-danger btn-sm mt-2"
+                formaction="@Url.Action("RemoveImage", "Spaceship", new { imageId = Model.ImageId, spaceshipId = Model.SpaceshipId })"
+                formmethod="post"
+                formnovalidate>
+            Удалить
+        </button>
+    </div>
+</div>

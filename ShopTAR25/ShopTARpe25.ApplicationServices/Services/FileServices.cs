@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
@@ -8,20 +9,29 @@ namespace ShopTARpe25.ApplicationServices.Services
 {
     public class FileServices : IFileServices
     {
+        private const string UploadFolderName = "multipleFileUpload";
+
         private readonly ShopTARpe25Context _context;
         private readonly IHostEnvironment _webHost;
 
+<<<<<<< Updated upstream
 
         public FileServices
             (
                 ShopTARpe25Context context,
                 IHostEnvironment webHost
             )
+=======
+        public FileServices(
+            ShopTARpe25Context context,
+            IHostEnvironment webHost)
+>>>>>>> Stashed changes
         {
             _context = context;
             _webHost = webHost;
         }
 
+<<<<<<< Updated upstream
 
         public async Task FilesToApi(SpaceshipDto dto, Spaceship domain)
         {
@@ -60,9 +70,67 @@ namespace ShopTARpe25.ApplicationServices.Services
                             await _context.FileToApis.AddAsync(path);
                         }
                     }
+=======
+        private string UploadsFolder =>
+            Path.Combine(_webHost.ContentRootPath, "wwwroot", UploadFolderName);
+
+        public async Task FilesToApi(SpaceshipDto dto, Spaceship domain)
+        {
+            if (dto.Files == null || dto.Files.Count == 0)
+            {
+                return;
+            }
+
+            // loo kaust, kui seda veel ei ole (CreateDirectory ei viska viga, kui kaust on olemas)
+            Directory.CreateDirectory(UploadsFolder);
+
+            foreach (var file in dto.Files)
+            {
+                if (file == null || file.Length == 0)
+                {
+                    continue;
+                }
+
+                // igale failile unikaalne Guid nime ette;
+                // Path.GetFileName kaitseb path traversal'i eest
+                string uniqueFileName = Guid.NewGuid() + "_" + Path.GetFileName(file.FileName);
+                string filePath = Path.Combine(UploadsFolder, uniqueFileName);
+
+                await using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+
+                FileToApi path = new()
+                {
+                    Id = Guid.NewGuid(),
+                    ExistingFilePath = uniqueFileName,
+                    SpaceshipId = domain.Id
+                };
+
+                await _context.FileToApis.AddAsync(path);
+            }
+        }
+
+        public async Task RemoveFilesBySpaceshipId(Guid spaceshipId)
+        {
+            var files = await _context.FileToApis
+                .Where(x => x.SpaceshipId == spaceshipId)
+                .ToListAsync();
+
+            foreach (var file in files)
+            {
+                var filePath = Path.Combine(UploadsFolder, file.ExistingFilePath);
+
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+>>>>>>> Stashed changes
                 }
                 
             }
+
+            _context.FileToApis.RemoveRange(files);
         }
     }
 }

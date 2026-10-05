@@ -1,4 +1,4 @@
-﻿namespace ShopTAR25.Models.Spaceship
+namespace ShopTAR25.Models.Spaceship
 {
     public class SpaceshipDetailsViewModel
     {
@@ -11,5 +11,6 @@
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
+        public List<ImageViewModel> Image { get; set; } = new();
     }
 }

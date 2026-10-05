@@ -56,7 +56,11 @@ namespace ShopTARpe25.Data.Migrations
                     b.ToTable("Spaceships");
                 });
 
+<<<<<<< Updated upstream
             modelBuilder.Entity("ShopTARpe25.Core.Dto.FileToApi", b =>
+=======
+            modelBuilder.Entity("ShopTARpe25.Core.Domain.FileToApi", b =>
+>>>>>>> Stashed changes
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

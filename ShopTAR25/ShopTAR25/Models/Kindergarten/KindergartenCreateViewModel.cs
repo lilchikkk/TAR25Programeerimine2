@@ -1,4 +1,4 @@
-namespace ShopTAR25.Models.Spaceship
+﻿namespace ShopTAR25.Models.Spaceship
 {
     public class SpaceshipCreateViewModel
     {
@@ -8,11 +8,7 @@ namespace ShopTAR25.Models.Spaceship
         public DateTime? Builddate { get; set; }
         public int? Crew { get; set; }
         public int? EnginePower { get; set; }
-<<<<<<< Updated upstream
-        public List<IFormFile> Files { get; set; }
-=======
         public List<IFormFile>? Files { get; set; }
->>>>>>> Stashed changes
         public List<ImageViewModel> Image { get; set; }
             = new List<ImageViewModel>();
 

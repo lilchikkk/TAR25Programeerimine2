@@ -1,4 +1,4 @@
-﻿@model ShopTAR25.Models.Spaceship.SpaceshipDetailsViewModel
+@model ShopTAR25.Models.Spaceship.SpaceshipDetailsViewModel
 
 <h1>Details</h1>
 
@@ -56,5 +56,14 @@
         </div>
     </dl>
 
-    <a asp-action="Index" asp-controller="spaceship" class="btn btn-danger">Back to List</a>
+    <div class="row mb-3">
+        @foreach (var image in Model.Image)
+        {
+            <div class="col-auto mb-2">
+                <img src="~/multipleFileUpload/@image.FilePath" alt="Spaceship image" style="max-width:150px;" />
+            </div>
+        }
+    </div>
+
+    <a asp-action="Index" asp-controller="spaceship" class="btn btn-secondary">Back to List</a>
 </div>

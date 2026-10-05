@@ -4,7 +4,6 @@ using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
 
-
 namespace ShopTARpe25.ApplicationServices.Services
 {
     public class SpaceshipServices : ISpaceshipServices
@@ -12,88 +11,88 @@ namespace ShopTARpe25.ApplicationServices.Services
         private readonly ShopTARpe25Context _context;
         private readonly IFileServices _fileServices;
 
-        public SpaceshipServices
-            (
-              ShopTARpe25Context context
-            )
+        public SpaceshipServices(
+            ShopTARpe25Context context,
+            IFileServices fileServices)
         {
             _context = context;
+            _fileServices = fileServices;
         }
 
         public async Task<Spaceship> Create(SpaceshipDto dto)
         {
             Spaceship domain = new();
 
-            domain.Id = dto.Id;
+            domain.Id = Guid.NewGuid();
             domain.Name = dto.Name;
             domain.Classification = dto.Classification;
             domain.Builddate = dto.Builddate;
             domain.Crew = dto.Crew;
             domain.EnginePower = dto.EnginePower;
-            domain.CreatedAt = dto.CreatedAt;
-            domain.ModifiedAt = dto.ModifiedAt;
             domain.CreatedAt = DateTime.Now;
             domain.ModifiedAt = DateTime.Now;
             //reame saama file teenuses välja kutsuda meetod,
             //mis salvestab failid servisesse
             _fileServices.FilesToApi(dto, domain);
 
-            //siia tuleb kood, mis salvetab domain
-            //objekti andmebaasi'
-            //tuleb kasutada repository'd, mis
-            //on defineeritud Core projektis
-            //konstruktori kaudu tuleb injectida repository
-
+            // salvestame failid ja lisame FileToApi kirjed contexti
+            await _fileServices.FilesToApi(dto, domain);
 
             await _context.Spaceships.AddAsync(domain);
             await _context.SaveChangesAsync();
 
             return domain;
-
-            // siia teha meetod nimega DetailsAsync
-            // see ainult pärib andmed contextist
-            
         }
+
         public async Task<Spaceship> DetailsAsync(Guid id)
         {
             var domain = await _context.Spaceships
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            return domain;
+            return domain!;
         }
 
         public async Task<Spaceship> Update(SpaceshipDto dto)
         {
-            Spaceship spaceship = new();
+            var domain = await _context.Spaceships
+                .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
-            spaceship.Id = dto.Id;
-            spaceship.Name = dto.Name;
-            spaceship.Classification = dto.Classification;
-            spaceship.Builddate = dto.Builddate;
-            spaceship.Crew = dto.Crew;
-            spaceship.EnginePower = dto.EnginePower;
-            spaceship.CreatedAt = dto.CreatedAt;
-            spaceship.ModifiedAt = DateTime.Now;
+            if (domain == null)
+            {
+                return null!;
+            }
 
-            _context.Spaceships.Update(spaceship);
+            domain.Name = dto.Name;
+            domain.Classification = dto.Classification;
+            domain.Builddate = dto.Builddate;
+            domain.Crew = dto.Crew;
+            domain.EnginePower = dto.EnginePower;
+            domain.ModifiedAt = DateTime.Now;
+
+            await _fileServices.FilesToApi(dto, domain);
+
             await _context.SaveChangesAsync();
 
-            return spaceship;
-
+            return domain;
         }
+
         public async Task<Spaceship> Delete(Guid id)
         {
             var result = await _context.Spaceships
                 .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (result == null)
+            {
+                return null!;
+            }
+
+            // kustutame ka laevaga seotud pildid
+            await _fileServices.RemoveFilesBySpaceshipId(id);
 
             _context.Spaceships.Remove(result);
             await _context.SaveChangesAsync();
 
             return result;
         }
-    }   
-
+    }
 }
-
-
-
